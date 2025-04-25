@@ -1,0 +1,35 @@
+.animate-led-spin {
+  position: relative;
+}
+
+.animate-led-spin::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 1.2rem; /* Mismo que el contenedor */
+  padding: 5px; /* Grosor del borde */
+  background: conic-gradient(from var(--angle, 0deg), transparent 70%, blue);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  /*mask-composite: exclude;*/
+  animation: 10s spin linear infinite;
+}
+
+@keyframes spin {
+  to {
+    --angle: 0deg;
+  } from{
+      --angle: 360deg;
+    }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 10deg;
+}
