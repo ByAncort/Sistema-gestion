@@ -28,6 +28,8 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Metric> metrics = new ArrayList<>();
 
+    @OneToOne
+    private Workspace workspace;
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

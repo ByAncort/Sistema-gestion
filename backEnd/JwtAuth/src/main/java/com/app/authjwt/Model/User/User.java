@@ -1,11 +1,15 @@
 package com.app.authjwt.Model.User;
 
+import com.app.authjwt.Model.Team;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.security.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,12 +24,23 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(name = "username" ,unique=true,nullable = false)
     private String username;
+    @Column(name = "email" ,unique=true,nullable = false)
     private String email;
     private String password;
-    private boolean enabled;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_id")
+    private Area area;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_team",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id")
+    )
+    private Set<Team> team = new HashSet<>();
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -39,16 +54,26 @@ public class User implements UserDetails {
                 .map(permission -> new SimpleGrantedAuthority(permission.getName()))
                 .collect(Collectors.toList());
     }
+    @CreatedDate
+    @Column(updatable = false)
+    private Timestamp createdAt;
 
+    @LastModifiedDate
+    private Timestamp updatedAt;
+    private boolean enabled = true;
+    private boolean locked = false;
+    private int failedLoginAttempts = 0;
+
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !locked;
+    }
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
 
     @Override
     public boolean isCredentialsNonExpired() {
