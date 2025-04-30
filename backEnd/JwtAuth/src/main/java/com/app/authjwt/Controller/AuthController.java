@@ -46,6 +46,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<AuthResponseV2> handleException(RuntimeException e) {
         AuthResponseV2 errorResponse = AuthResponseV2.builder()

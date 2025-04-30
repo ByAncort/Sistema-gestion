@@ -19,16 +19,21 @@ public class UserController {
     @Autowired
     private VerifyService verifyService;
 
+
+    @GetMapping("/test-connection")
+    public String test(){
+        return "Connection Success";
+    }
     @GetMapping("/info/profile")
     public Object infoProfile(Authentication authentication) {
-        if (!hasPermission(authentication, "READ_PERMISSIONS") &&
-                !hasPermission(authentication, "ADMIN_PERMISSIONS")) {
-            return NoAuthResponse.builder()
-                    .errorCode(HttpStatus.UNAUTHORIZED.value())
-                    .Mensaje("USUARIO NO TIENE PERMISOS NECESARIOS")
-                    .build();
-        }
-        return userService.getLoggedInUser();
+//        if (!hasPermission(authentication, "READ_PERMISSIONS") &&
+//                !hasPermission(authentication, "ADMIN_PERMISSIONS")) {
+//            return NoAuthResponse.builder()
+//                    .errorCode(HttpStatus.UNAUTHORIZED.value())
+//                    .Mensaje("USUARIO NO TIENE PERMISOS NECESARIOS")
+//                    .build();
+//        }
+        return  userService.getLoggedInUser();
     }
 
     private boolean hasPermission(Authentication auth, String permission) {
