@@ -98,7 +98,7 @@ export class AuthService {
       return of(false);
     }
 
-    return this.http.get(`${this.apiUrl}/api/v1/users/api/test-connection`, {
+    return this.http.get(`${this.apiUrl}/api/v1/users/info/profile`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

@@ -1,7 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { HttpRequest, HttpHandlerFn } from '@angular/common/http';
 
-export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const jwtToken = getJwtToken();
 
   if (jwtToken) {

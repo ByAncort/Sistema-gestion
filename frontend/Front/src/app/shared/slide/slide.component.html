@@ -1,0 +1,157 @@
+
+  <div
+    [class.w-20]="isMinimized"
+    [class.w-72]="!isMinimized"
+    class="bg-gray-100 h-screen p-5  pt-8 relative transition-all duration-300"
+  >
+    <svg
+      (click)="toggleMenu()"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="size-6 bg-white text-black text-3xl rounded-full absolute -right-3 top-9 cursor-pointer transition-transform duration-300"
+      [class.rotate-180]="isMinimized"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="m11.25 9-3 3m0 0 3 3m-3-3h7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      />
+    </svg>
+    <div class="mb-8 inline-flex items-center gap-2">
+      <div
+        class="size-9 cursor-pointer rounded bg-indigo-500 p-2 text-white transition-transform duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+             class="h-full w-full"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672Zm-7.518-.267A8.25 8.25 0 1 1 20.25 10.5M8.288 14.212A5.25 5.25 0 1 1 17.25 10.5" />
+        </svg>
+      </div>
+      <h1
+        class="origin-left font-medium text-gray-900 font-extrabold duration-300"
+        [class.-translate-x-4]="isMinimized"
+        [class.hidden]="isMinimized"
+      >
+        Gestion
+      </h1>
+    </div>
+  <!--  <ul class="pt-2">
+      <li *ngFor="let item of menu">
+        <a
+          [routerLink]="item.ruta"
+          class="flex items-center mt-2 py-2 px-1 text-sm text-gray-600 rounded cursor-pointer  transition-colors duration-200"
+          [attr.aria-label]="isMinimized ? item.nombre : null"
+          [class.hover:bg-gray-200]="!isMinimized"
+        >
+          <div class="shrink-0 size-9 p-1.5  text-gray-700 rounded transition-transform"
+               [class.bg-gray-300]="isMinimized"
+               [class.shadow]="isMinimized"
+               [class.text-white]="isMinimized">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-full w-full"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5"
+              />
+            </svg>
+          </div>
+          <span
+            class="pl-3 font-medium whitespace-nowrap transition-all duration-300"
+            [class.opacity-0]="isMinimized"
+            [class.-translate-x-4]="isMinimized"
+            [class.invisible]="isMinimized"
+          >
+          {{ item.nombre }}
+          </span>
+        </a>
+      </li>
+
+    </ul>
+-->
+
+    <div *ngFor="let item of menuItems" (mouseenter)="hoveredItem = item.id" (mouseleave)="hoveredItem = null">
+      <div
+        class="flex items-center mt-2 py-2 px-1 text-sm text-gray-600 rounded cursor-pointer transition-colors duration-200 relative"
+        [attr.aria-label]="isMinimized ? item.nombre : null"
+        [class.hover:bg-gray-200]="!isMinimized"
+        (click)="toggleSubmenu(item.id)"
+      >
+        <!-- Icono -->
+        <div class="shrink-0 size-9 p-1.5 text-gray-700 rounded transition-transform"
+             [class.bg-gray-300]="isMinimized"
+             [class.shadow]="isMinimized"
+             [class.text-white]="isMinimized">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-full w-full"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icono" />
+          </svg>
+        </div>
+
+        <!-- Título normal -->
+        <span
+          class="pl-3 font-medium whitespace-nowrap transition-all duration-300"
+          [class.opacity-0]="isMinimized"
+          [class.-translate-x-4]="isMinimized"
+          [class.invisible]="isMinimized"
+        >
+      {{ item.nombre }}
+    </span>
+
+        <!-- Tooltip para estado minimizado -->
+        <span
+          *ngIf="isMinimized && hoveredItem === item.id"
+          class="absolute left-full ml-2 px-2 py-1 bg-gray-100 rounded shadow-lg text-sm z-50 whitespace-nowrap"
+        >
+      {{ item.nombre }}
+    </span>
+      </div>
+
+      <!-- Submenú (mantener igual) -->
+      <div *ngIf="item.submenu && submenuStates[item.id]" class="ml-6 transition-all duration-300">
+        <ul>
+          <li *ngFor="let subItem of item.submenu">
+            <a
+              [routerLink]="subItem.ruta"
+              class="flex items-center
+              hover:text-blue-400 text-sm text-gray-600 rounded cursor-pointer  transition-colors duration-200"
+
+            >
+              <div class="shrink-0 size-9 p-1.5  text-gray-700 rounded transition-transform"
+                   [class.bg-gray-300]="isMinimized"
+                   [class.shadow]="isMinimized"
+                   [class.text-white]="isMinimized">
+
+              </div>
+              <span
+                class="pl-3 font-medium whitespace-nowrap transition-all duration-300"
+                [class.opacity-0]="isMinimized"
+                [class.-translate-x-4]="isMinimized"
+                [class.invisible]="isMinimized"
+              >
+            {{ subItem.nombre }}
+          </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+
+  </div>
+
