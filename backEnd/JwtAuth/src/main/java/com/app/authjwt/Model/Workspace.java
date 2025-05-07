@@ -15,7 +15,7 @@ import java.util.Set;
 public class Workspace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String name;
     @ManyToMany(mappedBy = "workspaces")
     private Set<Team> workspaces = new HashSet<>();
