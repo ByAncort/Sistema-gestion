@@ -18,6 +18,5 @@ public class TeamResponseDto {
     private String nombreTeam;
     private UserDto responsable;
     private Set<UserDto> users = new HashSet<>();
-    private Set<Workspace> workspaces = new HashSet<>();
-
+    private Set<WorkspaceDto> workspaces;
 }

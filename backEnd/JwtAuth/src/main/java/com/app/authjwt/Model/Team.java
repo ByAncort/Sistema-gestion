@@ -1,11 +1,9 @@
 package com.app.authjwt.Model;
 
 import com.app.authjwt.Model.User.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,17 +14,25 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String nombre;
 
     @OneToOne
     private User responsable;
-    @ManyToMany(mappedBy = "team")
+    @ManyToMany
+    @JoinTable(
+            name = "team_users",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<User> users = new HashSet<>();
+
 
     @ManyToMany
     @JoinTable(
@@ -34,6 +40,7 @@ public class Team {
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "workspace_id")
     )
+    @EqualsAndHashCode.Exclude
     private Set<Workspace> workspaces = new HashSet<>();
 
 }

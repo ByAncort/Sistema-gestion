@@ -1,6 +1,8 @@
 package com.app.authjwt.Service;
 
 import com.app.authjwt.Model.Team;
+import com.app.authjwt.Model.User.Permission;
+import com.app.authjwt.Model.User.Role;
 import com.app.authjwt.Model.User.User;
 import com.app.authjwt.Model.Workspace;
 import com.app.authjwt.Repository.TeamRepository;
@@ -10,7 +12,6 @@ import com.app.authjwt.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -71,6 +72,9 @@ public class TeamService {
                     .build();
             Team teamSaved = teamRepository.save(team);
 
+            logger.info("Usuarios guardados en el equipo: {}",
+                    teamSaved.getUsers().stream().map(User::getUsername).collect(Collectors.toList()));
+
             Set<UserDto> userDto=new HashSet<>();
             for(User u:teamSaved.getUsers()){
                 UserDto tmp=new UserDto();
@@ -106,17 +110,21 @@ public class TeamService {
                         .build();
             }).collect(Collectors.toList());
 
-            UserDto responsableDto=new UserDto();
-            responsableDto.setUsermane(responsable.getUsername());
-            responsableDto.setEmail(responsable.getEmail());
-            responsableDto.setRoles(roleDtos);
-            responsableDto.setEnabled(true);
+                UserDto responsableDto=new UserDto();
+                responsableDto.setUsermane(responsable.getUsername());
+                responsableDto.setEmail(responsable.getEmail());
+                responsableDto.setRoles(roleDtos);
+                responsableDto.setEnabled(true);
 
             TeamResponseDto response = TeamResponseDto.builder()
                     .nombreTeam(teamSaved.getNombre())
                     .responsable(responsableDto)
                     .users(userDto)
-                    .workspaces(teamSaved.getWorkspaces())
+                    .workspaces(
+                            teamSaved.getWorkspaces().stream()
+                                    .map(this::mapWorkspaceToDto)
+                                    .collect(Collectors.toSet())
+                    )
                     .build();
             return new ServiceResult<>(response);
         }catch (Exception e){
@@ -126,4 +134,75 @@ public class TeamService {
         }
 
     }
-}
+
+
+    public ServiceResult<List<TeamResponseDto>> getAllTeams() {
+        List<String> errors = new ArrayList<>();
+        try {
+            List<Team> teams = teamRepository.findAll();
+            List<TeamResponseDto> response = teams.stream()
+                    .map(this::mapTeamToDto)
+                    .collect(Collectors.toList());
+            return new ServiceResult<>(response);
+        } catch (Exception e) {
+            errors.add("Error fetching teams: " + e.getMessage());
+            return new ServiceResult<>(errors);
+        }
+    }
+
+    private TeamResponseDto mapTeamToDto(Team team) {
+        // Map users to UserDto
+        Set<UserDto> userDtos = team.getUsers().stream()
+                .map(this::mapUserToDto)
+                .collect(Collectors.toSet());
+
+        // Map responsable to UserDto
+        UserDto responsableDto = mapUserToDto(team.getResponsable());
+
+        // Map workspaces to WorkspaceDto
+        Set<WorkspaceDto> workspaceDtos = team.getWorkspaces().stream()
+                .map(this::mapWorkspaceToDto)
+                .collect(Collectors.toSet());
+
+        return TeamResponseDto.builder()
+                .nombreTeam(team.getNombre())
+                .users(userDtos)
+                .responsable(responsableDto)
+                .workspaces(workspaceDtos)
+                .build();
+    }
+
+    private UserDto mapUserToDto(User user) {
+        return UserDto.builder()
+                .usermane(user.getUsername())
+                .Email(user.getEmail())
+                .roles(mapRolesToDtos(user.getRoles()))
+                .enabled(user.isEnabled())
+                .build();
+    }
+
+    private List<RoleDto> mapRolesToDtos(Set<Role> roles) {
+        return roles.stream()
+                .map(role -> RoleDto.builder()
+                        .name(role.getName())
+                        .permissions(mapPermissionsToDtos(role.getPermissions()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private Set<PermissionDto> mapPermissionsToDtos(Set<Permission> permissions) {
+        return permissions.stream()
+                .map(perm -> PermissionDto.builder()
+                        .name(perm.getName())
+                        .build())
+                .collect(Collectors.toSet());
+    }
+
+
+
+    private WorkspaceDto mapWorkspaceToDto(Workspace workspace) {
+        return WorkspaceDto.builder()
+                .id(workspace.getId())
+                .name(workspace.getName())
+                .build();
+    }}
