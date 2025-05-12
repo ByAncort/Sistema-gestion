@@ -1,6 +1,5 @@
 package com.app.authjwt.Controller;
 
-import com.app.authjwt.Model.Team;
 import com.app.authjwt.Service.TeamService;
 import com.app.authjwt.dto.ServiceResult;
 import com.app.authjwt.dto.TeamRequestDto;
@@ -13,27 +12,40 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/teams")
 @RequiredArgsConstructor
-@RequestMapping("/api/team/")
 public class TeamController {
+
     private final TeamService teamService;
 
-    @PostMapping("create-team")
-    public ResponseEntity<?> crateTeam(@RequestBody TeamRequestDto teamRequestDto){
-        ServiceResult<TeamResponseDto> result=teamService.createTeam(teamRequestDto);
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getErrors());
-        } else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
-        }
+    @PostMapping
+    public ResponseEntity<ServiceResult<TeamResponseDto>> createTeam(@RequestBody TeamRequestDto request) {
+        ServiceResult<TeamResponseDto> result = teamService.createTeam(request);
+        return new ResponseEntity<>(result, result.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
     }
-    @GetMapping("listar-teams")
-    public ResponseEntity<?> listar(){
-        ServiceResult<List<TeamResponseDto>> result= teamService.getAllTeams();
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getErrors());
-        } else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
-        }
+
+    @GetMapping
+    public ResponseEntity<ServiceResult<List<TeamResponseDto>>> getAllTeams() {
+        ServiceResult<List<TeamResponseDto>> result = teamService.getAllTeams();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ServiceResult<TeamResponseDto>> getTeamById(@PathVariable Long id) {
+        ServiceResult<TeamResponseDto> result = teamService.getTeamById(id);
+        return result.isSuccess() ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ServiceResult<TeamResponseDto>> updateTeam(
+            @PathVariable Long id, @RequestBody TeamRequestDto request) {
+        ServiceResult<TeamResponseDto> result = teamService.updateTeam(id, request);
+        return result.isSuccess() ? ResponseEntity.ok(result) : ResponseEntity.badRequest().body(result);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ServiceResult<Void>> deleteTeam(@PathVariable Long id) {
+        ServiceResult<Void> result = teamService.deleteTeam(id);
+        return result.isSuccess() ? ResponseEntity.noContent().build() : ResponseEntity.badRequest().body(result);
     }
 }

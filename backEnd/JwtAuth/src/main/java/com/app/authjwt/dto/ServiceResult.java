@@ -18,6 +18,10 @@ public class ServiceResult<T> {
         this.data = null;
     }
 
+    public boolean isSuccess() {
+        return errors.isEmpty();
+    }
+
     public boolean hasErrors() {
         return !errors.isEmpty();
     }

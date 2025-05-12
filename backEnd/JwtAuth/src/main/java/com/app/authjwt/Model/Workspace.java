@@ -20,6 +20,6 @@ public class Workspace {
     private String name;
     @ManyToMany(mappedBy = "workspaces")
     @EqualsAndHashCode.Exclude
-    private Set<Team> workspaces = new HashSet<>();
+    private Set<Team> teams = new HashSet<>();
 
 }

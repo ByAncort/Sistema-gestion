@@ -9,6 +9,7 @@ import com.app.authjwt.Repository.TeamRepository;
 import com.app.authjwt.Repository.UserRepository;
 import com.app.authjwt.Repository.WorkspaceRepository;
 import com.app.authjwt.dto.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +136,87 @@ public class TeamService {
 
     }
 
+    @Transactional
+    public ServiceResult<TeamResponseDto> getTeamById(Long id) {
+        List<String> errors = new ArrayList<>();
+        try {
+            return teamRepository.findById(id)
+                    .map(this::mapTeamToDto)
+                    .map(ServiceResult::new)
+                    .orElseGet(() -> {
+                        errors.add("Team not found with id: " + id);
+                        return new ServiceResult<>(errors);
+                    });
+        } catch (Exception e) {
+            errors.add("Error fetching team: " + e.getMessage());
+            return new ServiceResult<>(errors);
+        }
+    }
+    @Transactional
+    public ServiceResult<TeamResponseDto> updateTeam(Long id, TeamRequestDto request) {
+        List<String> errors = new ArrayList<>();
 
+        Optional<Team> teamOpt = teamRepository.findById(id);
+        if (teamOpt.isEmpty()) {
+            errors.add("Team not found with id: " + id);
+            return new ServiceResult<>(errors);
+        }
+
+        Team team = teamOpt.get();
+
+        // Update nombre
+        if (request.getNombreTeam() != null) {
+            team.setNombre(request.getNombreTeam());
+        }
+
+        // Update responsable
+        if (request.getResponsable() != null) {
+            Optional<User> responsableOpt = userRepository.findById(request.getResponsable());
+            if (responsableOpt.isEmpty()) {
+                errors.add("Responsable user not found with id: " + request.getResponsable());
+                return new ServiceResult<>(errors);
+            }
+            team.setResponsable(responsableOpt.get());
+        }
+
+        // Update users
+        if (request.getUsersIds() != null) {
+            Set<User> users = new HashSet<>(userRepository.findAllById(request.getUsersIds()));
+            team.setUsers(users);
+        }
+
+        // Update workspaces
+        if (request.getWorkspacesIDds() != null) {
+            Set<Workspace> workspaces = new HashSet<>(workspaceRepository.findAllById(request.getWorkspacesIDds()));
+            team.setWorkspaces(workspaces);
+        }
+
+        try {
+            Team updatedTeam = teamRepository.save(team);
+            return new ServiceResult<>(mapTeamToDto(updatedTeam));
+        } catch (Exception e) {
+            logger.error("Error updating team: {}", e.getMessage());
+            errors.add("Error updating team: " + e.getMessage());
+            return new ServiceResult<>(errors);
+        }
+    }
+
+    @Transactional
+    public ServiceResult<Void> deleteTeam(Long id) {
+        List<String> errors = new ArrayList<>();
+        try {
+            if (teamRepository.existsById(id)) {
+                teamRepository.deleteById(id);
+                return new ServiceResult<>(null);
+            }
+            errors.add("Team not found with id: " + id);
+            return new ServiceResult<>(errors);
+        } catch (Exception e) {
+            logger.error("Error deleting team: {}", e.getMessage());
+            errors.add("Error deleting team: " + e.getMessage());
+            return new ServiceResult<>(errors);
+        }
+    }
     public ServiceResult<List<TeamResponseDto>> getAllTeams() {
         List<String> errors = new ArrayList<>();
         try {

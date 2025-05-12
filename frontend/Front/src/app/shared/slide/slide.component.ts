@@ -42,10 +42,10 @@ export class SlideComponent {
       ]
     },
     {
-      id: 'settings',
-      nombre: 'Settings',
-      ruta: '/settings',
-      icono: 'M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5'
+      id: 'team',
+      nombre: 'Team',
+      ruta: '/team',
+      icono: 'M10 15 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 M25 15 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 M17.5 25 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 M10 20 v5 M25 20 v5 M20 20 v5 M12.5 17.5 L17.5 22.5 M22.5 22.5 L27.5 17.5'
     }
 
   ];
