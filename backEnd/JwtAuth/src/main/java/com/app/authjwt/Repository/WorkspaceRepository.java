@@ -7,9 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WorkspaceRepository extends JpaRepository<Workspace,Long> {
     @Query("SELECT w FROM Workspace w JOIN w.teams t WHERE t.nombre = :teamName")
     List<Workspace> findAllByTeamName(@Param("teamName") String teamName);
+
+    Optional<Workspace> findById(Long id);
 }

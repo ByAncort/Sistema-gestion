@@ -84,6 +84,8 @@
         [attr.aria-label]="isMinimized ? item.nombre : null"
         [class.hover:bg-gray-200]="!isMinimized"
         (click)="toggleSubmenu(item.id)"
+        [routerLink]="item.ruta"
+        routerLinkActive="text-sky-900"
       >
         <!-- Icono -->
         <div class="shrink-0 size-9 p-1.5 text-gray-700 rounded transition-transform"

@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "tasks")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Builder
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,23 +27,9 @@ public class Task {
     @Lob
     private String description;
 
-    @Lob
-    @Column(name = "status_detail")
-    private String statusDetail;
-
-    private String assignee;
-
     @Column(name = "due_date")
     private LocalDate dueDate;
 
-    @Enumerated(EnumType.STRING)
-    private TaskPriority priority = TaskPriority.Medium;
-
-    @Column(columnDefinition = "JSON")
-    private String labels;
-
-    @Column(name = "estimated_time")
-    private Integer estimatedTime;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

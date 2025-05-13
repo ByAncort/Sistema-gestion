@@ -1,0 +1,103 @@
+<div class="p-6 min-h-screen bg-gray-100">
+  <!-- View Toggle -->
+  <div class="mb-6 flex gap-2">
+    <button
+      (click)="toggleView()"
+      class="px-4 py-2 rounded-lg transition-colors"
+      [ngClass]="{
+        'bg-blue-500 text-white': isKanbanView,
+        'bg-white text-gray-600 border border-gray-300': !isKanbanView
+      }"
+    >
+      Vista Kanban
+    </button>
+    <button
+      (click)="toggleView()"
+      class="px-4 py-2 rounded-lg transition-colors"
+      [ngClass]="{
+        'bg-blue-500 text-white': !isKanbanView,
+        'bg-white text-gray-600 border border-gray-300': isKanbanView
+      }"
+    >
+      Vista Tabla
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-8">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+    {{ error }}
+  </div>
+
+  <!-- Kanban View -->
+  <div *ngIf="board && isKanbanView && !loading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div
+      *ngFor="let column of board.column"
+      cdkDropList
+      [id]="column.id"
+      [cdkDropListData]="column.tasks"
+      (cdkDropListDropped)="drop($event, column)"
+      class="bg-white rounded-lg shadow p-4"
+    >
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">{{ column.name }}</h3>
+        <span class="bg-blue-100 text-blue-800 text-sm px-2.5 py-0.5 rounded-full">
+          {{ column.tasks.length }} tareas
+        </span>
+      </div>
+
+      <div
+        cdkDrag
+        *ngFor="let task of column.tasks"
+        class="bg-gray-50 mb-3 p-4 rounded-lg border border-gray-200 cursor-move hover:shadow-md transition-shadow"
+      >
+        <div class="font-medium text-gray-800">{{ task.title }}</div>
+        <div class="text-sm text-gray-500 mt-1">{{ task.description || 'Sin descripción' }}</div>
+        <div class="flex items-center mt-3 text-xs text-gray-400">
+          <span class="mr-2">🕒 {{ task.estimatedTime }}h</span>
+          <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded">
+            {{ task.priority }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table View -->
+  <div *ngIf="board && !isKanbanView && !loading" class="bg-white rounded-lg shadow overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prioridad</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tiempo</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asignado</th>
+      </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+      <tr *ngFor="let task of allTasks">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ task.title }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 text-sm rounded-full"
+                  [ngClass]="{
+                'bg-blue-100 text-blue-800': task.status === 'To Do',
+                'bg-yellow-100 text-yellow-800': task.status === 'In Progress',
+                'bg-green-100 text-green-800': task.status === 'Done'
+              }"
+            >
+              {{ task.status }}
+            </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ task.priority }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ task.estimatedTime }}h</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ task.assignee || 'Sin asignar' }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

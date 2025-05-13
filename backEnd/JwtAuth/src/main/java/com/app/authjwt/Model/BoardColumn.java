@@ -30,4 +30,14 @@ public class BoardColumn {
 
     @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
+
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setColumn(this);
+    }
+
+    public void removeTask(Task task) {
+        tasks.remove(task);
+        task.setColumn(null);
+    }
 }

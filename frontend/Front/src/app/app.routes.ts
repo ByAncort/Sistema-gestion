@@ -7,6 +7,7 @@ import {PrivateLayoutComponent} from './layouts/private-layout/private-layout.co
 import {TeamComponent} from './components/team/team.component';
 import {TeamTasksComponent} from './components/team-tasks/team-tasks.component';
 import {WorkspacesTeamComponent} from './components/workspaces-team/workspaces-team.component';
+import {WorkspacesBoardComponent} from './components/workspaces-board/workspaces-board.component';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,10 @@ export const routes: Routes = [
       {
         path:'team/workspaces/:teamName',
         component: WorkspacesTeamComponent
+      },
+      {
+        path:'workspace/:workspaceId/board',
+        component: WorkspacesBoardComponent
       }
     ]
   },

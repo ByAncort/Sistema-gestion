@@ -33,8 +33,9 @@ export class WorkspacesTeamComponent implements OnInit {
   error: string | null = null;
   teamName: string = '';
   navigateToWorkspaceTasks(workspaceId: number) {
-    this.router.navigate(['/workspace', workspaceId, 'tasks']);
+    this.router.navigate(['/workspace', workspaceId, 'board']);
   }
+
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.teamName = params['teamName'];
