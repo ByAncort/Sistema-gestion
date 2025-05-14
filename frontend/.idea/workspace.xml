@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9e154d26-2f69-4eb9-98f7-2c5840ccc80e" name="Changes" comment="" />
+    <list default="true" id="9e154d26-2f69-4eb9-98f7-2c5840ccc80e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Front/src/app/components/workspaces-board/workspaces-board.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Front/src/app/components/workspaces-board/workspaces-board.component.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,15 +18,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/Diego Cortes/Desktop/Sistema-gestion/frontend/Front",
-    "nodejs_package_manager_path": "npm"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Diego Cortes/Desktop/Sistema-gestion/frontend/Front&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -34,6 +36,7 @@
       <option name="presentableId" value="Default" />
       <updated>1747073994228</updated>
       <workItem from="1747073995578" duration="202000" />
+      <workItem from="1747248849374" duration="71000" />
     </task>
     <servers />
   </component>

@@ -1,38 +1,53 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Config } from '../../config';
+import { CdkDragDrop, CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import {FormsModule} from '@angular/forms';
+import { Config } from '../../config';
+import { TaskDetailComponent } from '../workspaces-board-recursos/task-detail/task-detail.component';
+import { SubtaskCreationComponent } from '../workspaces-board-recursos/subtask-creation/subtask-creation.component';
+import {TaskCreationComponent} from '../workspaces-board-recursos/task-creation/task-creation.component';
 
 @Component({
   selector: 'app-workspaces-board',
   standalone: true,
-  imports: [CommonModule, CdkDropList, CdkDrag,FormsModule],
+  imports: [
+    CommonModule,
+    CdkDropList,
+    CdkDrag,
+    FormsModule,
+    TaskDetailComponent,
+    SubtaskCreationComponent,
+    TaskCreationComponent
+  ],
   templateUrl: './workspaces-board.component.html',
   styleUrls: ['./workspaces-board.component.css']
 })
 export class WorkspacesBoardComponent implements OnInit {
+  // Propiedades del estado de la aplicación
   board: any;
-  boardId: number = 0;
-  loading: boolean = true;
-  error: string | null = null;
-  isKanbanView: boolean = true;
   groupedTasks: { [columnName: string]: any[] } = {};
-  private apiUrl = Config.API_URL;
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private http = inject(HttpClient);
-  workspaceId: string = '';
-  openSubtaskModal: boolean = false;
-
-  // Variables para la tarea seleccionada y su modal
   selectedTask: any = null;
-  showDetailModal: boolean = false;
+  loading = true;
+  error: string | null = null;
 
-  // Variables para la creación de nuevas subtareas
-  newSubtask: any = {
+  // Configuración y servicios
+  private readonly apiUrl = Config.API_URL;
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  // Estado de los modales
+  showDetailModal = false;
+  showSubtaskModal = false;
+
+  // IDs
+  workspaceId = '';
+  boardId = 0;
+
+  // Modelo de nueva subtarea
+  newSubtask = {
     title: '',
     priority: 'Medium',
     dueDate: '',
@@ -41,65 +56,105 @@ export class WorkspacesBoardComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    this.initializeBoardData();
+  }
+
+  // Métodos de inicialización
+  private initializeBoardData(): void {
     this.route.params.subscribe(params => {
       this.workspaceId = params['workspaceId'];
       this.fetchBoardData();
     });
   }
 
-  fetchBoardData(): void {
+  handleTaskCreated() {
+  this.fetchBoardData();
+  }
+
+  // Métodos de obtención de datos
+  private fetchBoardData(): void {
     this.http.get<any>(`${this.apiUrl}/api/boards/workspace/${this.workspaceId}`).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.board = response.data;
-          this.boardId = Number(response.data.id);
-          this.fetchBoardTask(this.boardId);
-          this.loading = false;
-        } else {
-          this.error = 'Error fetching board data.';
-          this.loading = false;
-        }
-      },
-      error: () => {
-        this.error = 'Error connecting to the server.';
-        this.loading = false;
-      }
+      next: (response) => this.handleBoardResponse(response),
+      error: () => this.handleError('Error connecting to the server')
     });
   }
 
-  fetchBoardTask(id: number): void {
+  private fetchBoardTask(id: number): void {
     this.http.get<any[]>(`${this.apiUrl}/api/boards/boards/${id}/full-tasks`).subscribe({
-      next: (tasks) => {
-        this.groupedTasks = {};
-        for (const task of tasks) {
-          if (!this.groupedTasks[task.columnName]) {
-            this.groupedTasks[task.columnName] = [];
-          }
-          this.groupedTasks[task.columnName].push(task);
-        }
-      },
-      error: () => {
-        this.error = 'Error fetching tasks.';
-      }
+      next: (tasks) => this.groupTasks(tasks),
+      error: () => this.handleError('Error fetching tasks')
     });
   }
 
+  // Manejo de tareas
   openTaskDetail(task: any): void {
     this.selectedTask = task;
     this.showDetailModal = true;
   }
 
+  saveTaskChanges(updatedTask: any): void {
+    console.log('Saving task:', updatedTask);
+    // Aquí iría tu lógica para actualizar la tarea
+    this.closeTaskDetail();
+  }
+
+
+  deleteSubtask(index: number): void {
+    if (this.selectedTask?.subtasks) {
+      this.selectedTask.subtasks.splice(index, 1);
+    }
+  }
+
+  // Manejo de subtareas
+  handleSubtaskCreate(newSubtask: any): void {
+    if (this.selectedTask) {
+      this.selectedTask.subtasks = this.selectedTask.subtasks || [];
+      this.selectedTask.subtasks.push(newSubtask);
+      console.log('Nueva subtarea creada:', newSubtask);
+    }
+  }
+
+  // Manejo de modales
   closeTaskDetail(): void {
     this.showDetailModal = false;
     this.selectedTask = null;
   }
 
   openSubtaskModalHandler(): void {
-    this.openSubtaskModal = true;
+    this.showSubtaskModal = true;
   }
 
   closeSubtaskModal(): void {
-    this.openSubtaskModal  = false;
+    this.showSubtaskModal = false;
+    this.resetSubtaskForm();
+  }
+
+  // Métodos auxiliares
+  private groupTasks(tasks: any[]): void {
+    this.groupedTasks = tasks.reduce((acc, task) => {
+      acc[task.columnName] = acc[task.columnName] || [];
+      acc[task.columnName].push(task);
+      return acc;
+    }, {});
+  }
+
+  private handleBoardResponse(response: any): void {
+    if (response.success) {
+      this.board = response.data;
+      this.boardId = Number(response.data.id);
+      this.fetchBoardTask(this.boardId);
+      this.loading = false;
+    } else {
+      this.handleError('Error fetching board data');
+    }
+  }
+
+  private handleError(message: string): void {
+    this.error = message;
+    this.loading = false;
+  }
+
+  private resetSubtaskForm(): void {
     this.newSubtask = {
       title: '',
       priority: 'Medium',
@@ -108,21 +163,5 @@ export class WorkspacesBoardComponent implements OnInit {
       puntos: 0
     };
   }
-  saveTaskChanges() {
-    // Implement your save logic here
-    // This should update the task in your backend/service
-    console.log('Saving task:', this.selectedTask);
-    this.closeTaskDetail();
-  }
-  deleteSubtask(index: number) {
-    if (this.selectedTask?.subtasks) {
-      this.selectedTask.subtasks.splice(index, 1);
-    }
-  }
-  createSubtask(): void {
-    if (this.newSubtask.title && this.newSubtask.horas && this.newSubtask.puntos) {
-      // Suponiendo que la API para crear la subtarea es algo como esto:
-      console.log(this.newSubtask)
-    }
-  }
+
 }
