@@ -22,11 +22,10 @@ public class Subtask {
     @Column(nullable = false, length = 255)
     private String title;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "assignee_id")
     private User assignee;
 
-    @Enumerated(EnumType.STRING)
-    private SubtaskStatus status = SubtaskStatus.Pending;
 
     @Column(name="horas_estimacion")
     private Double horas;

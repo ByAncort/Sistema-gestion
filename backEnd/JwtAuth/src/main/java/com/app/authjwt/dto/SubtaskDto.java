@@ -17,7 +17,6 @@ public class SubtaskDto {
     @NotBlank
     private String title;
     private Long assigneeId;
-    private SubtaskStatus status;
     private Double horas;
     private Integer puntos;
     private LocalDate dueDate;

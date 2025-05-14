@@ -1,5 +1,6 @@
 package com.app.authjwt.dto;
 
+import com.app.authjwt.Model.SubtaskStatus;
 import com.app.authjwt.Model.TaskPriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,7 @@ public class TaskDto {
 
     private String description;
     private LocalDate dueDate;
+//    private SubtaskStatus status;
 
     @NotNull
     private Long columnId;

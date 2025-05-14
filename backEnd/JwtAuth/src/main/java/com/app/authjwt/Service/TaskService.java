@@ -3,6 +3,7 @@ package com.app.authjwt.Service;
 import com.app.authjwt.Model.*;
 import com.app.authjwt.Model.User.User;
 import com.app.authjwt.Repository.*;
+import com.app.authjwt.dto.FullTaskDto;
 import com.app.authjwt.dto.ServiceResult;
 import com.app.authjwt.dto.SubtaskDto;
 import com.app.authjwt.dto.TaskDto;
@@ -34,6 +35,7 @@ public class TaskService {
                 .title(taskDto.getTitle())
                 .description(taskDto.getDescription())
                 .dueDate(taskDto.getDueDate())
+//                .status(taskDto.getStatus())
                 .column(column)
                 .position(1)
                 .subtasks(new ArrayList<>())
@@ -56,18 +58,16 @@ public class TaskService {
 
             for (SubtaskDto dto : subtaskDTOs) {
                 try {
-                    // Manejar asignación de usuario
                     User assignee = null;
                     if (dto.getAssigneeId() != null) {
                         assignee = userRepository.findById(dto.getAssigneeId())
                                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + dto.getAssigneeId()));
                     }
 
-                    // Construir y guardar subtarea
+
                     Subtask subtask = Subtask.builder()
                             .title(dto.getTitle())
                             .assignee(assignee)
-                            .status(dto.getStatus() != null ? dto.getStatus() : SubtaskStatus.Pending)
                             .horas(dto.getHoras())
                             .puntos(dto.getPuntos() != null ? dto.getPuntos() : 0)
                             .dueDate(dto.getDueDate())
@@ -83,7 +83,6 @@ public class TaskService {
             }
 
             if (!errors.isEmpty()) {
-                // Combinar errores con subtareas exitosas si se requiere
                 return new ServiceResult<>(errors);
             }
 
@@ -93,4 +92,61 @@ public class TaskService {
             return new ServiceResult<>(List.of(e.getMessage()));
         }
     }
+/*    public ServiceResult<List<SubtaskDto>> buscarBoard(String idBoard){
+
+    }*/
+    public List<FullTaskDto> getFullTasksByBoardId(Long boardId) {
+        // Buscar el board
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new RuntimeException("Board no encontrado con ID: " + boardId));
+
+        List<FullTaskDto> result = new ArrayList<>();
+
+        // Recorremos todas las columnas del board
+        for (BoardColumn column : board.getColumns()) {
+            for (Task task : column.getTasks()) {
+                FullTaskDto dto = FullTaskDto.builder()
+                        .id(task.getId())
+                        .title(task.getTitle())
+                        .description(task.getDescription())
+                        .dueDate(task.getDueDate())
+                        .position(task.getPosition())
+                        .createdAt(task.getCreatedAt())
+                        .startedAt(task.getStartedAt())
+                        .closedAt(task.getClosedAt())
+//                        .status(task.getStatus())
+
+                        .columnId(column.getId())
+                        .columnName(column.getName())
+                        .columnPosition(column.getPosition())
+                        .wipLimit(column.getWipLimit())
+
+                        .boardId(board.getId())
+                        .boardName(board.getName())
+                        .boardCreatedAt(board.getCreatedAt())
+
+                        .subtasks(task.getSubtasks().stream().map(subtask ->
+                                FullTaskDto.SubtaskInfo.builder()
+                                        .id(subtask.getId())
+                                        .title(subtask.getTitle())
+                                        .assigneeName(subtask.getAssignee() != null
+                                                ? subtask.getAssignee().getUsername()
+                                                : null)
+                                        .horas(subtask.getHoras())
+                                        .puntos(subtask.getPuntos())
+                                        .dueDate(subtask.getDueDate())
+                                        .createdAt(subtask.getCreatedAt())
+                                        .priority(subtask.getPriority())
+                                        .build()
+                        ).toList())
+                        .build();
+
+                result.add(dto);
+            }
+        }
+
+        return result;
+    }
+
+
 }

@@ -30,6 +30,8 @@ public class Task {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+//    @Enumerated(EnumType.STRING)
+//    private SubtaskStatus status = SubtaskStatus.Pending;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

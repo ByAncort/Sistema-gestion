@@ -1,10 +1,7 @@
 package com.app.authjwt.Controller;
 
 import com.app.authjwt.Service.TaskService;
-import com.app.authjwt.dto.ServiceResult;
-import com.app.authjwt.dto.SubtaskDto;
-import com.app.authjwt.dto.TaskDto;
-import com.app.authjwt.dto.TeamResponseDto;
+import com.app.authjwt.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,5 +28,11 @@ public class TaskController {
         ServiceResult<List<SubtaskDto>> result =taskService.addSubtasksToTask(idTask,dto);
         return new ResponseEntity<>(result, result.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
 
+    }
+
+    @GetMapping("/boards/{boardId}/full-tasks")
+    public ResponseEntity<List<FullTaskDto>> getTasksByBoard(@PathVariable Long boardId) {
+        List<FullTaskDto> tasks = taskService.getFullTasksByBoardId(boardId);
+        return ResponseEntity.ok(tasks);
     }
 }

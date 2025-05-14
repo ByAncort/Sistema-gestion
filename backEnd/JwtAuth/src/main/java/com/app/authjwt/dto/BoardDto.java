@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class BoardDto {
+    private Long id;
     private String name;
     private List<BoardColumnDto> column;
 }

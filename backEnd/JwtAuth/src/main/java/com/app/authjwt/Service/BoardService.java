@@ -76,12 +76,14 @@ public class BoardService {
          List<BoardColumn> columns=board.getColumns();
 
          BoardDto dtoFinal= BoardDto.builder()
+                 .id(board.getId())
                  .name(board.getName())
                  .column(
                          columns.stream()
                                  .map(boardColumn -> new BoardColumnDto(
                                          boardColumn.getName(),
                                          boardColumn.getPosition()
+
                                  ))
                                  .collect(Collectors.toList())
 
@@ -138,4 +140,7 @@ public class BoardService {
         column.setPosition(position);
         return columnRepository.save(column);
     }
+
+
+
 }
