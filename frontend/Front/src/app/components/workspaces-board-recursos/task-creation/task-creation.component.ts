@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {Config } from '../../../config';
 import {FormsModule} from '@angular/forms';
@@ -20,19 +20,18 @@ export class TaskCreationComponent {
   newTask = {
     title: '',
     description: '',
-    dueDate: '',
-    columnId: 1,
-    position: 1
+    dueDate: ''
   };
   errorMessage = '';
   loading = false;
 
   private apiUrl = Config.API_URL;
+  @Input() boardId!: number;
 
   constructor(private http: HttpClient) {}
 
   openModal() {
-    console.log('Abrir modal');
+    console.log('Abrir modal '+ this.boardId );
     this.showModal = true;
   }
 
@@ -45,7 +44,7 @@ export class TaskCreationComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    this.http.post(`${this.apiUrl}/api/boards/save`, this.newTask)
+    this.http.post(`${this.apiUrl}/api/boards/${this.boardId}/tasks/save`, this.newTask)
       .subscribe({
         next: () => {
           this.taskCreated.emit();
@@ -63,9 +62,7 @@ export class TaskCreationComponent {
     this.newTask = {
       title: '',
       description: '',
-      dueDate: '',
-      columnId: 1,
-      position: 1
+      dueDate: ''
     };
   }
 }

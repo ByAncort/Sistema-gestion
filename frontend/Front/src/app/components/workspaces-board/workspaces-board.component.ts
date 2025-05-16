@@ -1,21 +1,20 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { CdkDragDrop, CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Config } from '../../config';
 import { TaskDetailComponent } from '../workspaces-board-recursos/task-detail/task-detail.component';
 import { SubtaskCreationComponent } from '../workspaces-board-recursos/subtask-creation/subtask-creation.component';
-import {TaskCreationComponent} from '../workspaces-board-recursos/task-creation/task-creation.component';
+import { TaskCreationComponent } from '../workspaces-board-recursos/task-creation/task-creation.component';
+import { CdkDragDrop, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-workspaces-board',
   standalone: true,
   imports: [
     CommonModule,
-    CdkDropList,
-    CdkDrag,
+    DragDropModule,
     FormsModule,
     TaskDetailComponent,
     SubtaskCreationComponent,
@@ -25,28 +24,22 @@ import {TaskCreationComponent} from '../workspaces-board-recursos/task-creation/
   styleUrls: ['./workspaces-board.component.css']
 })
 export class WorkspacesBoardComponent implements OnInit {
-  // Propiedades del estado de la aplicación
   board: any;
   groupedTasks: { [columnName: string]: any[] } = {};
   selectedTask: any = null;
   loading = true;
   error: string | null = null;
 
-  // Configuración y servicios
   private readonly apiUrl = Config.API_URL;
   private readonly http = inject(HttpClient);
-  private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  // Estado de los modales
   showDetailModal = false;
   showSubtaskModal = false;
-
-  // IDs
   workspaceId = '';
   boardId = 0;
+  connectedDropListsIds: string[] = [];
 
-  // Modelo de nueva subtarea
   newSubtask = {
     title: '',
     priority: 'Medium',
@@ -59,7 +52,29 @@ export class WorkspacesBoardComponent implements OnInit {
     this.initializeBoardData();
   }
 
-  // Métodos de inicialización
+  onTaskDrop(event: CdkDragDrop<any[]>, targetColumn: any) {
+    if (event.previousContainer === event.container) return;
+
+    const task = event.previousContainer.data[event.previousIndex];
+
+    transferArrayItem(
+      event.previousContainer.data,
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    // Mostrar IDs en consola
+    console.log('Task ID:', task.id, 'New Column ID:', targetColumn.id);
+
+    this.http.put(`${this.apiUrl}/api/boards/update/${task.id}/column/${targetColumn.id}`, {})
+      .subscribe({
+        next: (res) => console.log('Task updated successfully', res),
+        error: (err) => console.error('Error updating task', err)
+      });
+
+  }
+
   private initializeBoardData(): void {
     this.route.params.subscribe(params => {
       this.workspaceId = params['workspaceId'];
@@ -67,11 +82,6 @@ export class WorkspacesBoardComponent implements OnInit {
     });
   }
 
-  handleTaskCreated() {
-  this.fetchBoardData();
-  }
-
-  // Métodos de obtención de datos
   private fetchBoardData(): void {
     this.http.get<any>(`${this.apiUrl}/api/boards/workspace/${this.workspaceId}`).subscribe({
       next: (response) => this.handleBoardResponse(response),
@@ -79,25 +89,60 @@ export class WorkspacesBoardComponent implements OnInit {
     });
   }
 
+  private handleBoardResponse(response: any): void {
+    if (response.success) {
+      this.board = response.data;
+      this.boardId = Number(response.data.id);
+
+      // Configurar listas conectadas después de cargar el board
+      this.connectedDropListsIds = this.board.column.map((col: any) => `cdk-drop-list-${col.id}`);
+
+      this.fetchBoardTask(this.boardId);
+      this.loading = false;
+    } else {
+      this.handleError('Error fetching board data');
+    }
+  }
+
   private fetchBoardTask(id: number): void {
     this.http.get<any[]>(`${this.apiUrl}/api/boards/boards/${id}/full-tasks`).subscribe({
-      next: (tasks) => this.groupTasks(tasks),
+      next: (tasks) => {
+        this.groupTasks(tasks);
+      },
       error: () => this.handleError('Error fetching tasks')
     });
   }
 
-  // Manejo de tareas
+  // Resto de métodos sin cambios...
+  handleTaskCreated() {
+    this.fetchBoardData();
+  }
+
   openTaskDetail(task: any): void {
     this.selectedTask = task;
     this.showDetailModal = true;
   }
 
   saveTaskChanges(updatedTask: any): void {
-    console.log('Saving task:', updatedTask);
-    // Aquí iría tu lógica para actualizar la tarea
-    this.closeTaskDetail();
-  }
+    const body = {
+      id: updatedTask.id,
+      title: updatedTask.title,
+      description: updatedTask.description,
+      dueDate: updatedTask.dueDate,
+      columnId: updatedTask.columnId,
+      position: updatedTask.position,
+    };
 
+    this.http.put<any>(`${this.apiUrl}/api/boards/actualizar`, body).subscribe({
+      next: (response) => {
+        console.log('Tarea actualizada:', response);
+        this.closeTaskDetail();
+      },
+      error: (error) => {
+        console.error('Error al actualizar la tarea:', error);
+      }
+    });
+  }
 
   deleteSubtask(index: number): void {
     if (this.selectedTask?.subtasks) {
@@ -105,16 +150,13 @@ export class WorkspacesBoardComponent implements OnInit {
     }
   }
 
-  // Manejo de subtareas
   handleSubtaskCreate(newSubtask: any): void {
     if (this.selectedTask) {
       this.selectedTask.subtasks = this.selectedTask.subtasks || [];
       this.selectedTask.subtasks.push(newSubtask);
-      console.log('Nueva subtarea creada:', newSubtask);
     }
   }
 
-  // Manejo de modales
   closeTaskDetail(): void {
     this.showDetailModal = false;
     this.selectedTask = null;
@@ -129,24 +171,17 @@ export class WorkspacesBoardComponent implements OnInit {
     this.resetSubtaskForm();
   }
 
-  // Métodos auxiliares
   private groupTasks(tasks: any[]): void {
-    this.groupedTasks = tasks.reduce((acc, task) => {
-      acc[task.columnName] = acc[task.columnName] || [];
-      acc[task.columnName].push(task);
+    this.groupedTasks = this.board.column.reduce((acc: any, col: any) => {
+      acc[col.name] = [];
       return acc;
     }, {});
-  }
 
-  private handleBoardResponse(response: any): void {
-    if (response.success) {
-      this.board = response.data;
-      this.boardId = Number(response.data.id);
-      this.fetchBoardTask(this.boardId);
-      this.loading = false;
-    } else {
-      this.handleError('Error fetching board data');
-    }
+    tasks.forEach(task => {
+      if (this.groupedTasks[task.columnName]) {
+        this.groupedTasks[task.columnName].push(task);
+      }
+    });
   }
 
   private handleError(message: string): void {
@@ -163,5 +198,4 @@ export class WorkspacesBoardComponent implements OnInit {
       puntos: 0
     };
   }
-
 }

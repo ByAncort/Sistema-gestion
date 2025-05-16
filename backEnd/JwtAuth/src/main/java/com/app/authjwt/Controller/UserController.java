@@ -1,14 +1,16 @@
 package com.app.authjwt.Controller;
 
 import com.app.authjwt.Service.UserService;
-import com.app.authjwt.Payload.response.NoAuthResponse;
 import com.app.authjwt.Service.VerifyService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 @RestController
@@ -19,6 +21,10 @@ public class UserController {
     @Autowired
     private VerifyService verifyService;
 
+    @GetMapping("listar-users")
+    public List<ObjectNode> listar(){
+        return userService.listarUser();
+    }
 
     @GetMapping("/test-connection")
     public String test(){

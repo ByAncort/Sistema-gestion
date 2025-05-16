@@ -1,8 +1,6 @@
+<!-- workspaces-board.component.html -->
 <div *ngIf="loading" class="fixed inset-0 flex items-center justify-center bg-white/80 z-50">
-  <div class="flex flex-col items-center">
-    <div class="animate-spin w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full"></div>
-    <p class="mt-3 text-gray-500 font-medium">Loading board...</p>
-  </div>
+  <!-- Spinner de carga -->
 </div>
 
 <div *ngIf="error" class="mx-4 mt-4 p-3 bg-red-50/90 border-l-4 border-red-500 rounded-r text-red-600 text-sm font-medium">
@@ -10,16 +8,24 @@
 </div>
 
 <div *ngIf="board && !loading" class="p-6">
+  <!-- Encabezado -->
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-semibold text-gray-900">{{ board.name }}</h1>
     <div class="flex items-center space-x-2">
       <app-task-creation
         (taskCreated)="handleTaskCreated()"
+        [boardId]="boardId"
       ></app-task-creation>
     </div>
   </div>
-  <div class="flex space-x-4  scrollbar-thumb-gray-300 scrollbar-track-transparent">
-    <div *ngFor="let column of board.column" class="flex flex-col w-72 flex-shrink-0">
+
+  <!-- Columnas -->
+  <div class="flex space-x-4 scrollbar-thumb-gray-300 scrollbar-track-transparent">
+    <div
+      *ngFor="let column of board.column"
+      class="flex flex-col w-72 flex-shrink-0"
+    >
+      <!-- Encabezado de columna -->
       <div class="flex items-center justify-between mb-3 px-1">
         <div class="flex items-center space-x-2">
           <div class="w-3 h-3 rounded-full bg-blue-500"></div>
@@ -30,22 +36,34 @@
         </span>
       </div>
 
-
-      <div class="flex-1 space-y-3 min-h-[100px]">
-        <div *ngFor="let task of groupedTasks[column.name]"
-             (click)="openTaskDetail(task)"
-             class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-200 cursor-pointer transition-all duration-200 hover:shadow-md group">
+      <!-- Lista de tareas -->
+      <div
+        cdkDropList
+        [id]="'cdk-drop-list-' + column.id"
+        [cdkDropListData]="groupedTasks[column.name] || []"
+        [cdkDropListConnectedTo]="connectedDropListsIds"
+        (cdkDropListDropped)="onTaskDrop($event, column)"
+        class="flex-1 space-y-3 min-h-[100px]"
+      >
+        <!-- Tareas -->
+        <div
+          *ngFor="let task of groupedTasks[column.name]"
+          cdkDrag
+          (click)="openTaskDetail(task)"
+          class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-blue-200 cursor-pointer transition-all duration-200 hover:shadow-md group"
+        >
+          <!-- Contenido de la tarea -->
           <div class="flex justify-between items-start mb-2">
-            <h3 class="text-sm font-medium text-gray-900">{{ task.title }}</h3>
+
+            <h3 class="text-sm font-medium text-gray-900">{{ task.title }} {{task.id}}</h3>
+
             <span class="text-xs text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">
               {{ task.dueDate | date:'shortDate' }}
             </span>
           </div>
-
           <div *ngIf="task.description" class="text-xs text-gray-500 mb-3 line-clamp-2">
             {{ task.description }}
           </div>
-
           <div class="flex items-center justify-between">
             <span class="text-xs font-medium px-2 py-1 rounded-full"
                   [ngClass]="{
@@ -65,13 +83,14 @@
           </div>
         </div>
 
+        <!-- Placeholder vacío -->
         <div *ngIf="!groupedTasks[column.name]?.length" class="h-32 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-400">
           Drop tasks here
         </div>
       </div>
     </div>
 
-    <!-- Add new column -->
+    <!-- Botón para añadir nueva columna -->
     <div class="w-72 flex-shrink-0">
       <button class="mt-8 w-full flex items-center justify-center p-3 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -83,19 +102,18 @@
   </div>
 </div>
 
-
-<!-- Componente padre actualizado -->
+<!-- Modales -->
 <app-subtask-creation
   *ngIf="showSubtaskModal"
   (create)="handleSubtaskCreate($event)"
-  (close)="closeSubtaskModal()"> >
+  (close)="closeSubtaskModal()">
 </app-subtask-creation>
 
 <app-task-detail
   *ngIf="showDetailModal"
   [selectedTask]="selectedTask"
   (close)="closeTaskDetail()"
-(save)="saveTaskChanges($event)"
-(deleteSubtask)="deleteSubtask($event)"
-(openSubtaskModal)="openSubtaskModalHandler()">
+  (save)="saveTaskChanges($event)"
+  (deleteSubtask)="deleteSubtask($event)"
+  (openSubtaskModal)="openSubtaskModalHandler()">
 </app-task-detail>

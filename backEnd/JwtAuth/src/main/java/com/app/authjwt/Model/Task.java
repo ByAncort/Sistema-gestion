@@ -30,6 +30,9 @@ public class Task {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+    public Board getBoard() {
+        return this.column != null ? this.column.getBoard() : null;
+    }
 //    @Enumerated(EnumType.STRING)
 //    private SubtaskStatus status = SubtaskStatus.Pending;
 
@@ -46,6 +49,7 @@ public class Task {
     private Integer position;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @OrderColumn(name = "position")
     private List<Subtask> subtasks = new ArrayList<>();
 
     @PrePersist

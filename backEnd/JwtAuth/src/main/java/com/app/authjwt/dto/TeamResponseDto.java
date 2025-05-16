@@ -15,6 +15,7 @@ import java.util.Set;
 @Data
 @Builder
 public class TeamResponseDto {
+    private Long id;
     private String nombreTeam;
     private UserDto responsable;
     private Set<UserDto> users = new HashSet<>();

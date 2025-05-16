@@ -46,6 +46,7 @@ public class BoardService {
                             .name(savedBoard.getName())
                             .column(defaultColumns.stream()
                                     .map(boardColumn -> new BoardColumnDto(
+                                            boardColumn.getId(),
                                             boardColumn.getName(),
                                             boardColumn.getPosition()))
                                     .collect(Collectors.toList())
@@ -81,6 +82,7 @@ public class BoardService {
                  .column(
                          columns.stream()
                                  .map(boardColumn -> new BoardColumnDto(
+                                         boardColumn.getId(),
                                          boardColumn.getName(),
                                          boardColumn.getPosition()
 

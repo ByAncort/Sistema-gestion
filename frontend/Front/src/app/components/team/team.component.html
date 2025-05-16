@@ -19,6 +19,18 @@
       </div>
     </div>
   </div>
+  <button
+    (click)="teamCreateModal.open()"
+    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+    Create New Team
+  </button>
+
+  <app-team-create
+    #teamCreateModal
+    [users]="usersList"
+    [workspaces]="workspacesList"
+    (teamCreated)="handleTeamCreated($event)">
+  </app-team-create>
 
   <!-- Content -->
   <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -27,6 +39,7 @@
       class="group bg-white backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 border border-slate-100/50 hover:border-blue-100 cursor-pointer relative overflow-hidden"
       (click)="navigateToTeamTasks(team.nombreTeam)"
     >
+
       <div class="absolute inset-0 bg-gradient-to-br from-white to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"></div>
 
       <div class="relative z-10">

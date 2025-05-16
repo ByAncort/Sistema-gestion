@@ -246,6 +246,7 @@ public class TeamService {
                 .collect(Collectors.toSet());
 
         return TeamResponseDto.builder()
+                .id(team.getId())
                 .nombreTeam(team.getNombre())
                 .users(userDtos)
                 .responsable(responsableDto)

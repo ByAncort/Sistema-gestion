@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "boards")
@@ -33,5 +34,11 @@ public class Board {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    public List<Task> getAllTasks() {
+        return this.columns.stream()
+                .flatMap(column -> column.getTasks().stream())
+                .collect(Collectors.toList());
     }
 }

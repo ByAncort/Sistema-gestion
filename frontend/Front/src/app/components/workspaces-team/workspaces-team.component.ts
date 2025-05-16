@@ -1,9 +1,10 @@
 // workspaces-team.component.ts
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit,ViewChild  } from '@angular/core';
 import {Router, ActivatedRoute, RouterModule} from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Config } from '../../config';
 import {CommonModule} from '@angular/common';
+import {TeamCreateComponent} from '../team/team-create/team-create.component';
 
 interface WorkspaceResponse {
   id: number;
@@ -64,4 +65,6 @@ export class WorkspacesTeamComponent implements OnInit {
         }
       });
   }
+
+
 }

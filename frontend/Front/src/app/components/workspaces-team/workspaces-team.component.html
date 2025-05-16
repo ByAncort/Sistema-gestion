@@ -25,6 +25,7 @@
 
   <!-- Content -->
   <div *ngIf="!loading && !error" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
     <div
       *ngFor="let workspace of workspaces"
       (click)="navigateToWorkspaceTasks(workspace.id)"

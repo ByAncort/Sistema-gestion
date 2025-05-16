@@ -8,6 +8,10 @@ import com.app.authjwt.config.jwt.JwtUtils;
 import com.app.authjwt.dto.PermissionDto;
 import com.app.authjwt.dto.RoleDto;
 import com.app.authjwt.dto.UserDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import io.swagger.v3.core.util.Json;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,6 +84,20 @@ public class UserService {
         } catch (Exception e) {
             return null;
         }
+    }
+    public List<ObjectNode> listarUser() {
+        ObjectMapper mapper = new ObjectMapper();
+        List<ObjectNode> userList = new ArrayList<>();
+        List<User> users = userRepository.findAll();
+
+        for (User user : users) {
+            ObjectNode json = mapper.createObjectNode();
+            json.put("id", user.getId());
+            json.put("nombre", user.getUsername());
+            userList.add(json);
+        }
+
+        return userList;
     }
 
 }

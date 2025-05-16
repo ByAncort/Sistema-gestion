@@ -29,7 +29,9 @@ public class BoardColumn {
     private Integer wipLimit;
 
     @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn(name = "position")
     private List<Task> tasks = new ArrayList<>();
+
 
     public void addTask(Task task) {
         tasks.add(task);

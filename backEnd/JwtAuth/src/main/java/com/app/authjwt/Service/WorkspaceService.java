@@ -1,6 +1,8 @@
 package com.app.authjwt.Service;
 
+import com.app.authjwt.Model.Team;
 import com.app.authjwt.Model.Workspace;
+import com.app.authjwt.Repository.TeamRepository;
 import com.app.authjwt.Repository.WorkspaceRepository;
 import com.app.authjwt.dto.ServiceResult;
 import com.app.authjwt.dto.WorkspaceDto;
@@ -11,9 +13,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
+    private final TeamRepository teamRepository;
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceService.class);
 
     public ServiceResult<List<WorkspaceDto>> listarWorkspacesByTeam(String teamName) {
@@ -64,9 +65,23 @@ public class WorkspaceService {
     @Transactional
     public ServiceResult<WorkspaceDto> createWorkspace(WorkspaceDto request) {
         try {
+            List<Long> teamIds=request.getTeamsId();
+            List<Team> teams =teamRepository.findAllById(teamIds);
+
+            if (teams.size() != teamIds.size()) {
+                Set<Long> foundIds = teams.stream().map(Team::getId).collect(Collectors.toSet());
+                List<Long> missingIds = teamIds.stream()
+                        .filter(id -> !foundIds.contains(id))
+                        .collect(Collectors.toList());
+                String errorMessage = "Invalid team IDs: " + missingIds;
+                return new ServiceResult<>(List.of(errorMessage));
+            }
+
             Workspace workspace = new Workspace();
             workspace.setName(request.getName());
+            workspace.setTeams(new HashSet<>(teams));
 
+            teams.forEach(team -> team.getWorkspaces().add(workspace));
             Workspace savedWorkspace = workspaceRepository.save(workspace);
             return new ServiceResult<>(mapToDto(savedWorkspace));
         } catch (Exception e) {
