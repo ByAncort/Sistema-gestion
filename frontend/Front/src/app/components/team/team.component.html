@@ -1,4 +1,4 @@
-<div class="p-6 max-w-7xl mx-auto">
+<div class="p-6  mx-auto">
   <div class="mb-10">
     <h2 class="text-3xl font-bold text-slate-800 mb-2">Your Teams</h2>
     <p class="text-slate-500">Manage and organize your work groups</p>
@@ -19,10 +19,10 @@
       </div>
     </div>
   </div>
-  <button
-    (click)="teamCreateModal.open()"
+  <button  *ngIf="teams.length > 0"
+           (click)="teamCreateModal.open()"
     class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-    Create New Team
+    Create Team
   </button>
 
   <app-team-create
@@ -37,7 +37,7 @@
     <div
       *ngFor="let team of teams"
       class="group bg-white backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 border border-slate-100/50 hover:border-blue-100 cursor-pointer relative overflow-hidden"
-      (click)="navigateToTeamTasks(team.nombreTeam)"
+      (click)="navigateToTeamTasks(team.id)"
     >
 
       <div class="absolute inset-0 bg-gradient-to-br from-white to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"></div>
@@ -82,7 +82,7 @@
         </svg>
         <h3 class="text-lg font-medium text-slate-800 mb-2">No teams found</h3>
         <p class="text-slate-500 text-sm mb-4">Start by creating a new team</p>
-        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button (click)="teamCreateModal.open()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           Create Team
         </button>
       </div>

@@ -1,12 +1,10 @@
-// workspaces-team.component.ts
-import { Component, inject, OnInit,ViewChild  } from '@angular/core';
-import {Router, ActivatedRoute, RouterModule} from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { Config } from '../../config';
-import {CommonModule} from '@angular/common';
-import {TeamCreateComponent} from '../team/team-create/team-create.component';
-import {CreateWorkspaceComponent} from './create-workspace/create-workspace.component';
 
+import {Component, inject} from '@angular/core';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {HttpClient} from '@angular/common/http';
+import {Config} from '../../config';
+import {CommonModule} from '@angular/common';
+import {CreateWorkspaceComponent} from '../workspaces-team/create-workspace/create-workspace.component';
 interface WorkspaceResponse {
   id: number;
   name: string;
@@ -20,12 +18,12 @@ interface ApiResponse {
 }
 
 @Component({
-  selector: 'app-workspaces-team',
-  templateUrl: './workspaces-team.component.html',
+  selector: 'app-all-workspaces',
   imports: [CommonModule,RouterModule,CreateWorkspaceComponent],
-  styleUrls: ['./workspaces-team.component.css']
+  templateUrl: './all-workspaces.component.html',
+  styleUrl: './all-workspaces.component.css'
 })
-export class WorkspacesTeamComponent implements OnInit {
+export class AllWorkspacesComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private http = inject(HttpClient);
@@ -35,7 +33,6 @@ export class WorkspacesTeamComponent implements OnInit {
   workspaces: WorkspaceResponse[] = [];
   loading: boolean = true;
   error: string | null = null;
-  teamName: string = '';
   navigateToWorkspaceTasks(workspaceId: number) {
     this.router.navigate(['/workspace', workspaceId, 'board']);
   }
@@ -51,17 +48,13 @@ export class WorkspacesTeamComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.http.get<ApiResponse>(`${this.apiUrl}/api/workspaces/find/team-name/${this.teamId}`)
+    this.http.get<ApiResponse>(`${this.apiUrl}/api/workspaces`)
       .subscribe({
         next: (response) => {
           if (response.success) {
             this.workspaces = response.data ??[];
             console.log("Team Id es: "+this.teamId);
-            if (response.data!=null) {
-              this.teamName = this.workspaces[0].name;
             } else {
-              this.teamName = 'Equipo sin nombre';
-            }          } else {
             this.error = response.errors.join(', ') || 'Error al cargar los workspaces';
           }
           this.loading = false;
@@ -73,6 +66,5 @@ export class WorkspacesTeamComponent implements OnInit {
         }
       });
   }
-
 
 }

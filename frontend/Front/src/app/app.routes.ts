@@ -8,6 +8,7 @@ import {TeamComponent} from './components/team/team.component';
 import {TeamTasksComponent} from './components/team-tasks/team-tasks.component';
 import {WorkspacesTeamComponent} from './components/workspaces-team/workspaces-team.component';
 import {WorkspacesBoardComponent} from './components/workspaces-board/workspaces-board.component';
+import {AllWorkspacesComponent} from './components/all-workspaces/all-workspaces.component';
 
 export const routes: Routes = [
   {
@@ -24,13 +25,18 @@ export const routes: Routes = [
         component: TeamComponent,
       },
       {
-        path:'team/workspaces/:teamName',
+        path:'team/workspaces/:teamId',
         component: WorkspacesTeamComponent
       },
       {
         path:'workspace/:workspaceId/board',
         component: WorkspacesBoardComponent
+      },
+      {
+        path:'all-workspaces',
+        component: AllWorkspacesComponent
       }
+
     ]
   },
   {

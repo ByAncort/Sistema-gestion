@@ -7,6 +7,7 @@ import {Router} from '@angular/router';
 import {TeamCreateComponent} from './team-create/team-create.component';
 
 interface TeamResponse {
+  id: number,
   nombreTeam: string;
   responsable: {
     usermane: string;
@@ -54,7 +55,7 @@ export class TeamComponent implements OnInit {
   error: string | null = null;
   usersList: any[] = [];
 
-  navigateToTeamTasks(teamName: String) {
+  navigateToTeamTasks(teamName: number) {
     this.router.navigate(['/team', 'workspaces',teamName]);
   }
 
@@ -119,8 +120,6 @@ export class TeamComponent implements OnInit {
     });
   }
 
-// En tu componente padre
-
   workspacesList = [
     {
       id: 1,
@@ -143,5 +142,6 @@ export class TeamComponent implements OnInit {
       description: 'Innovación tecnológica'
     }
   ];
+
 
 }

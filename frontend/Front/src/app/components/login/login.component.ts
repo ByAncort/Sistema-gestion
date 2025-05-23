@@ -12,18 +12,25 @@ import {Router} from '@angular/router';
 export class LoginComponent {
   username: string = '';
   password: string = '';
+  errorMessage: string = '';
   authService = inject(AuthService);
   route = inject(Router);
-  onSubmit() {
 
+  onSubmit() {
     console.log(`login: ${this.username} / ${this.password}`);
-    this.authService
-      .login({
-      username:this.username,
-      password:this.password,
-      }).subscribe(()=>{
+    this.authService.login({
+      username: this.username,
+      password: this.password,
+    }).subscribe({
+      next: (response) => {
         alert('Login success!');
-        this.route.navigate(['/'])
+        this.route.navigate(['/']);
+      },
+      error: (err) => {
+        this.errorMessage = err.message;
+        console.error('Error in component:', err.message);
+        alert(`Login failed: ${err.message}`);  // Optional: show alert for error
+      }
     });
   }
 

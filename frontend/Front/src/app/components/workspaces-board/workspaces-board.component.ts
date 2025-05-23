@@ -29,6 +29,13 @@ export class WorkspacesBoardComponent implements OnInit {
   selectedTask: any = null;
   loading = true;
   error: string | null = null;
+  viewMode: 'board' | 'table' = 'board';
+  showAddColumnModal = false;
+  addingColumn = false;
+  newColumn = {
+    name: '',
+    position: 1
+  };
 
   private readonly apiUrl = Config.API_URL;
   private readonly http = inject(HttpClient);
@@ -51,7 +58,9 @@ export class WorkspacesBoardComponent implements OnInit {
   ngOnInit(): void {
     this.initializeBoardData();
   }
-
+  getTasksCountForColumn(columnName: string): number {
+    return this.groupedTasks[columnName]?.length || 0;
+  }
   onTaskDrop(event: CdkDragDrop<any[]>, targetColumn: any) {
     if (event.previousContainer === event.container) return;
 
@@ -197,5 +206,43 @@ export class WorkspacesBoardComponent implements OnInit {
       horas: 0,
       puntos: 0
     };
+  }
+
+  openAddColumnModal() {
+    this.showAddColumnModal = true;
+    this.newColumn = {
+      name: '',
+      position: this.board.column.length + 1
+    };
+  }
+  closeAddColumnModal() {
+    this.showAddColumnModal = false;
+  }
+  submitNewColumn() {
+    if (!this.newColumn.name.trim()) {
+      return; // Validación básica
+    }
+
+    this.addingColumn = true;
+
+    this.http.post<any>(
+      `${this.apiUrl}/api/boards/workspace/agregar/columna/${this.boardId}`,
+      {
+        name: this.newColumn.name,
+        position: this.newColumn.position
+      },
+
+    ).subscribe({
+      next: (response) => {
+        this.addingColumn = false;
+        this.closeAddColumnModal();
+        this.fetchBoardData(); // Recargar los datos del board
+      },
+      error: (error) => {
+        this.addingColumn = false;
+        this.error = 'Error adding column: ' + error.message;
+        setTimeout(() => this.error = null, 5000);
+      }
+    });
   }
 }

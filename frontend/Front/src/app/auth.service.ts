@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import {BehaviorSubject, Observable, of, throwError} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
@@ -52,7 +52,8 @@ export class AuthService {
       tap((response: any) => this.doLoginUser(user.username, response.token)),
       catchError(error => {
         console.error('Login error:', error);
-        return of(null);
+        const errorMessage = error.error?.message || 'Error desconocido durante el login';
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
