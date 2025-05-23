@@ -49,6 +49,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "assignee", fetch = FetchType.LAZY)
     private List<Subtask> assignedTasks = new ArrayList<>();
 
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

@@ -23,8 +23,16 @@ public class Team {
 
     private String nombre;
 
-    @OneToOne
-    private User responsable;
+    @ManyToMany
+    @JoinTable(
+            name = "team_responsables",
+            joinColumns = @JoinColumn(name = "team_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> responsables = new HashSet<>();
+
+
+
     @ManyToMany
     @JoinTable(
             name = "team_users",

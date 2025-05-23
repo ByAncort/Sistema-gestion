@@ -1,6 +1,7 @@
 package com.app.authjwt.Controller;
 import com.app.authjwt.Model.Board;
 import com.app.authjwt.Service.*;
+import com.app.authjwt.dto.BoardColumnDto;
 import com.app.authjwt.dto.BoardDto;
 import com.app.authjwt.dto.ServiceResult;
 import com.fasterxml.jackson.databind.util.JSONPObject;
@@ -28,6 +29,11 @@ public class BoardController {
     @GetMapping("/workspace/{workspaceId}")
     public ResponseEntity<Board> listBoard(@PathVariable Long workspaceId){
         ServiceResult<BoardDto> result= boardService.mostrarBoardWorkspace(workspaceId);
+        return new ResponseEntity(result,HttpStatus.OK);
+    }
+    @PostMapping("/workspace/agregar/columna/{boardId}")
+    public ResponseEntity<Board> agregarColumna(@PathVariable Long boardId,@RequestBody BoardColumnDto columnDto){
+        ServiceResult<BoardDto> result= boardService.addColumnToBoard(boardId,columnDto);
         return new ResponseEntity(result,HttpStatus.OK);
     }
 

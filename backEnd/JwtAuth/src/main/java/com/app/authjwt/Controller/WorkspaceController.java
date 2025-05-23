@@ -23,9 +23,9 @@ public class WorkspaceController {
         return new ResponseEntity<>(result, result.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/find/team-name/{nombreTeam}")
-    public ResponseEntity<ServiceResult<List<WorkspaceDto>>> getByTeam(@PathVariable String nombreTeam) {
-        ServiceResult<List<WorkspaceDto>> result = workspaceService.listarWorkspacesByTeam(nombreTeam);
+    @GetMapping("/find/team-name/{idTeam}")
+    public ResponseEntity<ServiceResult<List<WorkspaceDto>>> getByTeam(@PathVariable Long idTeam) {
+        ServiceResult<List<WorkspaceDto>> result = workspaceService.listarWorkspacesByTeam(idTeam);
         return ResponseEntity.status(result.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST).body(result);
     }
 

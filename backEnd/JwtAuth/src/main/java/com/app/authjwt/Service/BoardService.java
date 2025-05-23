@@ -97,7 +97,40 @@ public class BoardService {
             return new ServiceResult<>(List.of("Error al recuperar Board: " + e.getMessage()));
         }
     }
+    public ServiceResult<BoardDto> addColumnToBoard(Long boardId, BoardColumnDto columnDto) {
+        try {
 
+            Board board = boardRepository.findById(boardId)
+                    .orElseThrow(() -> new RuntimeException("Board no encontrado con ID: " + boardId));
+
+            BoardColumn newColumn = new BoardColumn();
+            newColumn.setName(columnDto.getName());
+            newColumn.setPosition(columnDto.getPosition());
+            newColumn.setBoard(board);
+            BoardColumn savedColumn = columnRepository.save(newColumn);
+            board.getColumns().add(savedColumn);
+            boardRepository.save(board);
+
+            BoardDto responseDto = BoardDto.builder()
+                    .id(board.getId())
+                    .name(board.getName())
+                    .column(
+                            board.getColumns().stream()
+                                    .map(col -> new BoardColumnDto(
+                                            col.getId(),
+                                            col.getName(),
+                                            col.getPosition()
+                                    ))
+                                    .collect(Collectors.toList())
+                    )
+                    .build();
+
+            return new ServiceResult<>(responseDto);
+
+        } catch (Exception e) {
+            return new ServiceResult<>(List.of("Error al añadir columna: " + e.getMessage()));
+        }
+    }
 
     @Transactional
     public void reorderColumns(Long boardId, List<Long> newColumnOrder) {

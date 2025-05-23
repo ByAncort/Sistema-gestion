@@ -67,7 +67,7 @@ public class TeamService {
         try{
             Team team = Team.builder()
                     .nombre(request.getNombreTeam())
-                    .responsable(responsable)
+                    .responsables(Set.of(responsable))
                     .users(users)
                     .workspaces(workspaces)
                     .build();
@@ -176,7 +176,7 @@ public class TeamService {
                 errors.add("Responsable user not found with id: " + request.getResponsable());
                 return new ServiceResult<>(errors);
             }
-            team.setResponsable(responsableOpt.get());
+            team.setResponsables(Set.of(responsableOpt.get()));
         }
 
         // Update users
@@ -238,7 +238,11 @@ public class TeamService {
                 .collect(Collectors.toSet());
 
         // Map responsable to UserDto
-        UserDto responsableDto = mapUserToDto(team.getResponsable());
+        UserDto responsableDto = team.getResponsables().stream()
+                .findFirst()
+                .map(this::mapUserToDto)
+                .orElse(null);
+
 
         // Map workspaces to WorkspaceDto
         Set<WorkspaceDto> workspaceDtos = team.getWorkspaces().stream()

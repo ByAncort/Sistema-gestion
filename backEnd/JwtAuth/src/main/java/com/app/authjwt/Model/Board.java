@@ -29,7 +29,8 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Metric> metrics = new ArrayList<>();
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "workspace_id")
     private Workspace workspace;
     @PrePersist
     protected void onCreate() {

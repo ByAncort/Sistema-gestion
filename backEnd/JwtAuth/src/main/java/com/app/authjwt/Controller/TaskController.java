@@ -63,6 +63,11 @@ public class TaskController {
         List<FullTaskDto> tasks = taskService.getFullTasksByBoardId(boardId);
         return ResponseEntity.ok(tasks);
     }
+    @GetMapping("/boards/full-tasks/for-user")
+    public ResponseEntity<List<FullTaskDto>> getTaskForUser() {
+        ServiceResult<List<FullTaskDto>> tasks = taskService.traerTaskLogger();
+        return ResponseEntity.ok(tasks.getData());
+    }
 
 
 

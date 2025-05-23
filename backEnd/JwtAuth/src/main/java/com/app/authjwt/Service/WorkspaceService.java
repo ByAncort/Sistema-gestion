@@ -24,19 +24,13 @@ public class WorkspaceService {
     private final TeamRepository teamRepository;
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceService.class);
 
-    public ServiceResult<List<WorkspaceDto>> listarWorkspacesByTeam(String teamName) {
+    public ServiceResult<List<WorkspaceDto>> listarWorkspacesByTeam(Long idTeam) {
         List<String> errors = new ArrayList<>();
-
-        if (teamName == null || teamName.isBlank()) {
-            errors.add("El nombre del equipo no puede estar vacío");
-            return new ServiceResult<>(errors);
-        }
-
         try {
-            List<Workspace> workspaces = workspaceRepository.findAllByTeamName(teamName);
-
+            List<Workspace> workspaces = workspaceRepository.findAllByTeamId(idTeam);
+//            logger.infoworkspaces));
             if (workspaces.isEmpty()) {
-                return new ServiceResult<>(Collections.emptyList()); // Considerar si vacío es error o no
+                return new ServiceResult<>(Collections.emptyList());
             }
 
             return new ServiceResult<>(workspaces.stream()

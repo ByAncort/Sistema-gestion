@@ -9,7 +9,11 @@ import com.app.authjwt.dto.SubtaskDto;
 import com.app.authjwt.dto.TaskDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 
@@ -28,7 +33,32 @@ public class TaskService {
     private final BoardColumnRepository boardColumnRepository;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(TaskService.class);
 
+    public ServiceResult<List<FullTaskDto>> traerTaskLogger() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = null;
+
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        }
+
+        if (username == null) {
+            return new ServiceResult<>(List.of("No se pudo obtener el usuario autenticado."));
+        }
+        logger.info("Obteniendo Task para "+username);
+        List<Task> tasksList = taskRepository.findTasksBySubtaskAssigneeUsername(username);
+
+        List<FullTaskDto> result = tasksList.stream()
+                .map(task -> {
+                    BoardColumn column = task.getColumn();
+                    Board board = column != null ? column.getBoard() : null;
+                    return mapToFullTaskDto(task, column, board);
+                })
+                .collect(Collectors.toList());
+
+        return new ServiceResult<>(result);
+    }
 
     public ServiceResult<TaskDto> guardarTask(Long boardId, TaskDto taskDto) {
         Board board = boardRepository.findById(boardId)

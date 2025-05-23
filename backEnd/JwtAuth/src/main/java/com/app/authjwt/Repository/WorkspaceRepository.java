@@ -15,4 +15,7 @@ public interface WorkspaceRepository extends JpaRepository<Workspace,Long> {
     List<Workspace> findAllByTeamName(@Param("teamName") String teamName);
 
     Optional<Workspace> findById(Long id);
+    @Query("SELECT w FROM Workspace w JOIN w.teams t WHERE t.id = :teamId")
+    List<Workspace> findAllByTeamId(@Param("teamId") Long teamId);
+    List<Workspace> findAllById(Long id);
 }
